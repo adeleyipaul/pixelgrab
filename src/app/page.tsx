@@ -55,7 +55,7 @@ export default function Home() {
     <div className="flex flex-col w-full">
 
       {/* ─── Hero ─── */}
-      <section className="relative flex flex-col items-center text-center gap-7 sm:gap-9 pt-12 sm:pt-20 pb-20 sm:pb-28 overflow-hidden">
+      <section className="relative flex flex-col items-center text-center gap-7 sm:gap-9 pt-[4.5rem] sm:pt-[6.5rem] pb-20 sm:pb-28 overflow-hidden -mt-6">
         {/* Ambient glow */}
         <div
           aria-hidden="true"
@@ -165,8 +165,8 @@ export default function Home() {
               desc: "Copy individual values, grab everything at once, or download a CSS, JSON, or Tailwind file.",
             },
           ].map(({ step, title, desc }, i) => (
-            <FadeUp key={step} delay={i * 90}>
-              <div className="relative flex flex-col gap-3 p-6 rounded-2xl border border-zinc-800/50 bg-zinc-900/20 hover:border-zinc-700/60 hover:bg-zinc-900/40 transition-all duration-300 overflow-hidden">
+            <FadeUp key={step} delay={i * 90} className="h-full">
+              <div className="h-full relative flex flex-col gap-3 p-6 rounded-2xl border border-zinc-800/50 bg-zinc-900/20 hover:border-zinc-700/60 hover:bg-zinc-900/40 transition-all duration-300 overflow-hidden">
                 <span
                   aria-hidden="true"
                   className="pointer-events-none select-none absolute -bottom-2 -right-1 text-[5.5rem] font-black text-zinc-800/60 leading-none"

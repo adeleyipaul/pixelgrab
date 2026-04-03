@@ -4,7 +4,7 @@
 
 Upload an image, grab the visible colors, and use them for design, branding, UI work, or creative inspiration.
 
-|<img width="2519" height="1312" alt="pixelgrab" src="https://github.com/user-attachments/assets/2e382f38-9dcb-49f8-8b47-4d0ef29ea163" />
+<img width="2519" height="1312" alt="pixelgrab" src="https://github.com/user-attachments/assets/2e382f38-9dcb-49f8-8b47-4d0ef29ea163" />
 
 ## Live Demo
 

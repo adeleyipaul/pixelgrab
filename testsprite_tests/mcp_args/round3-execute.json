@@ -1,0 +1,7 @@
+{
+  "projectName": "pixel-grab",
+  "projectPath": "C:\\Users\\raiden\\Documents\\Hackathons\\pixel-grab",
+  "testIds": [],
+  "additionalInstruction": "Round 3 after fixes. App changes: upload input now has data-testid image-upload-input, palette loading has data-testid palette-loading with accessible status text, source image has data-testid source-image, CTAs have primary-palette-cta and secondary-palette-cta, format controls have format-hex/rgb/hsl, palette cells have palette-color-N, and export/copy controls have export-css/export-json/export-tailwind/copy-all-colors. Corrupted image files now trigger visible error text: 'The image could not be processed. Please try another image.' Critical instruction: DO NOT depend on repo fixture paths or available_file_paths. For every upload-dependent generated test, create the needed file inside the Python Playwright test before upload. Use base64.b64decode to write a valid PNG to /tmp/palette_sample.png, write a tiny valid PNG to /tmp/tiny.png, write plain invalid bytes to /tmp/corrupted.png, write a >10MB /tmp/oversized.png, and write /tmp/not_image.txt for invalid-file rejection. Then call set_input_files on input[data-testid='image-upload-input']. Do not block on missing external files. Re-test upload, palette extraction, HEX/RGB/HSL switching, copy color, copy all, CSS/JSON/Tailwind export, invalid file, corrupted file, oversized file, tiny image, drag/drop if feasible, mobile viewport, and CTA navigation. The app does not require login.",
+  "serverMode": "development"
+}

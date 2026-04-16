@@ -1,0 +1,20 @@
+{
+  "projectName": "pixel-grab",
+  "projectPath": "C:\\Users\\raiden\\Documents\\Hackathons\\pixel-grab",
+  "testIds": [
+    "TC001",
+    "TC002",
+    "TC003",
+    "TC004",
+    "TC005",
+    "TC006",
+    "TC007",
+    "TC008",
+    "TC010",
+    "TC011",
+    "TC012",
+    "TC014"
+  ],
+  "additionalInstruction": "Targeted Round 5 recovery only. Do not regenerate or rerun the known-invalid file-upload tests unchanged. Use the triage in testsprite_tests/round4-triage.md and the refined plan in testsprite_tests/round5-refined-test-plan.json. For the selected IDs, rewrite/replace the flows to use the app's bundled sample image path instead of OS file picker upload: navigate to /palette, click [data-testid='sample-image-button'], wait for [data-testid='palette-loading'] to disappear if it appears, then assert [data-testid='source-image'] and [data-testid='palette-color-0'] as needed. Do NOT use /tmp files, repo fixture paths, data: URL uploads, available_file_paths, set_input_files, or drag/drop file payloads in this round. Use stable selectors: [data-testid='sample-image-button'], [data-testid='source-image'], [data-testid='palette-color-0'], [data-testid='format-rgb'], [data-testid='format-hsl'], [data-testid='copy-all-colors'], [data-testid='upload-new-image'], [data-testid='image-dropzone'], input[data-testid='image-upload-input'], [data-testid='export-css'], [data-testid='export-json'], [data-testid='export-tailwind'], [data-testid='export-modal-copy'], [data-testid='export-modal-download'], [data-testid='export-modal-close'], [data-testid='primary-palette-cta'], and [data-testid='secondary-palette-cta']. Exclude corrupted/oversized/unsupported-file negative upload validation from automated Round 5 because Round 4 proved this TestSprite runner cannot provide file bytes; those remain manual/future fixture follow-up. The app does not require login.",
+  "serverMode": "development"
+}

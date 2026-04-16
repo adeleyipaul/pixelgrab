@@ -1,0 +1,7 @@
+{
+  "projectName": "pixel-grab",
+  "projectPath": "C:\\Users\\raiden\\Documents\\Hackathons\\pixel-grab",
+  "testIds": [],
+  "additionalInstruction": "Round 1 for Pixel Grab hackathon submission. Prioritize realistic frontend end-to-end behavior on /palette: valid image upload via click and drag/drop, palette extraction success, HEX/RGB/HSL display correctness, copy color action, copy all, CSS/JSON/Tailwind export modal copy/download actions, invalid non-image rejection, corrupted image handling, very large image over 10 MB rejection, very small image handling, loading skeleton/state, empty fallback/error states, responsive mobile layout, and accessibility basics for primary controls and outputs. The app does not require login.",
+  "serverMode": "development"
+}

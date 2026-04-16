@@ -1,0 +1,7 @@
+{
+  "projectName": "pixel-grab",
+  "projectPath": "C:\\Users\\raiden\\Documents\\Hackathons\\pixel-grab",
+  "testIds": [],
+  "additionalInstruction": "Round 2 refinement for Pixel Grab. Round 1 completed with 2/15 passing and most upload-dependent tests BLOCKED because the TestSprite runner did not have image files. Use these repo fixture files explicitly for upload steps: testsprite_tests/fixtures/palette-sample.png for valid image upload and palette extraction, testsprite_tests/fixtures/tiny.png for very small image handling, testsprite_tests/fixtures/corrupted.png for corrupted image handling, testsprite_tests/fixtures/oversized.png for >10 MB rejection, and testsprite_tests/fixtures/not-image.txt for invalid file rejection. Re-run and refine coverage based on Round 1 gaps: click upload, drag/drop upload, palette extraction, HEX/RGB/HSL values, copy color, copy all, CSS/JSON/Tailwind export modal copy/download actions, mobile viewport upload-to-export flow, keyboard accessibility and visible focus for browse/upload/copy/export/close actions, clipboard failure handling where browser permission is unavailable, download/export correctness, and drag/drop rejection messaging. The app does not require login.",
+  "serverMode": "development"
+}

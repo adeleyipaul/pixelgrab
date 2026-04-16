@@ -7,6 +7,11 @@ import Link from "next/link";
 
 type ColorFormat = "hex" | "rgb" | "hsl";
 
+type PaletteColor = {
+  hex: () => string;
+  rgb: () => { r: number; g: number; b: number };
+};
+
 type ExportModalState = {
   formatName: string;
   content: string;
@@ -19,7 +24,8 @@ function rgbToHslStr(r: number, g: number, b: number) {
   g /= 255;
   b /= 255;
   const max = Math.max(r, g, b), min = Math.min(r, g, b);
-  let h = 0, s = 0, l = (max + min) / 2;
+  let h = 0, s = 0;
+  const l = (max + min) / 2;
   if (max !== min) {
     const d = max - min;
     s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
@@ -35,7 +41,7 @@ function rgbToHslStr(r: number, g: number, b: number) {
 
 export default function PalettePage() {
   const [file, setFile] = useState<File | null>(null);
-  const [palette, setPalette] = useState<any[]>([]);
+  const [palette, setPalette] = useState<PaletteColor[]>([]);
   const [loading, setLoading] = useState(false);
   const [copiedState, setCopiedState] = useState<string | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -67,7 +73,9 @@ export default function PalettePage() {
     setLoading(true);
     setErrorMsg(null);
     try {
-      const { getPaletteSync } = await import("colorthief");
+      const { getPaletteSync } = await import("colorthief") as {
+        getPaletteSync: (image: HTMLImageElement, options: { colorCount: number }) => PaletteColor[] | null;
+      };
       const colors = getPaletteSync(imgRef.current, { colorCount: 20 });
       
       if (!colors) {
@@ -76,7 +84,7 @@ export default function PalettePage() {
       }
 
       // Filter out overly similar colors to get only truthful distinct dominant colors
-      const distinct: any[] = [];
+      const distinct: PaletteColor[] = [];
       const threshold = 35; // RGB distance threshold
 
       for (const color of colors) {
@@ -96,9 +104,9 @@ export default function PalettePage() {
       }
 
       setPalette(distinct);
-    } catch (e: any) {
+    } catch (e: unknown) {
       console.error("Failed to extract colors", e);
-      setErrorMsg(e.message || "Failed to extract colors. Please try another image.");
+      setErrorMsg(e instanceof Error ? e.message : "Failed to extract colors. Please try another image.");
       setPalette([]);
       showToast("Failed to extract palette", "error");
     } finally {
@@ -109,6 +117,9 @@ export default function PalettePage() {
   useEffect(() => {
     if (!file || !imgRef.current) return;
     const objUrl = URL.createObjectURL(file);
+    setLoading(true);
+    setErrorMsg(null);
+    setPalette([]);
     imgRef.current.src = objUrl;
 
     imgRef.current.onload = () => {
@@ -116,11 +127,18 @@ export default function PalettePage() {
       setTimeout(() => extractColors(), 300);
     };
 
+    imgRef.current.onerror = () => {
+      setLoading(false);
+      setPalette([]);
+      setErrorMsg("The image could not be processed. Please try another image.");
+      showToast("The image could not be processed", "error");
+    };
+
     return () => URL.revokeObjectURL(objUrl);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [file]);
 
-  const getFormattedColor = (color: any) => {
+  const getFormattedColor = (color: PaletteColor) => {
     if (colorFormat === "hex") return color.hex().toLowerCase();
     const { r, g, b } = color.rgb();
     if (colorFormat === "rgb") return `rgb(${r}, ${g}, ${b})`;
@@ -307,6 +325,29 @@ ${formattedColors}
     }
   };
 
+  const loadSampleImage = async () => {
+    setErrorMsg(null);
+    setPalette([]);
+    setCopiedState(null);
+
+    try {
+      const response = await fetch("/samples/palette-sample.png");
+      if (!response.ok) {
+        throw new Error("Sample image request failed");
+      }
+
+      const blob = await response.blob();
+      const sampleFile = new File([blob], "pixelgrab-sample.png", {
+        type: blob.type || "image/png",
+      });
+      setFile(sampleFile);
+    } catch {
+      setLoading(false);
+      setErrorMsg("The sample image could not be loaded. Please upload an image instead.");
+      showToast("Failed to load sample image", "error");
+    }
+  };
+
   const clearUpload = () => {
     setFile(null);
     setPalette([]);
@@ -335,6 +376,15 @@ ${formattedColors}
           <div className="w-full max-w-2xl">
             <Dropzone onFileAccepted={setFile} />
           </div>
+          <button
+            type="button"
+            onClick={loadSampleImage}
+            data-testid="sample-image-button"
+            className="inline-flex items-center justify-center gap-2 rounded-xl border border-zinc-700 bg-zinc-900 px-4 py-2.5 text-sm font-semibold text-zinc-200 transition-colors hover:border-zinc-500 hover:bg-zinc-800 active:scale-95"
+          >
+            <ImageIcon className="w-4 h-4 text-zinc-400" />
+            Try sample image
+          </button>
           <div className="flex flex-wrap justify-center items-center gap-x-4 gap-y-2 text-xs text-zinc-600">
             <span>HEX · RGB · HSL</span>
             <span className="w-1 h-1 rounded-full bg-zinc-700" />
@@ -354,6 +404,7 @@ ${formattedColors}
               </h3>
               <button 
                 onClick={clearUpload} 
+                data-testid="upload-new-image"
                 className="text-sm font-medium text-blue-400 hover:text-blue-300 transition-colors active:scale-95 px-2 py-1 rounded-md hover:bg-blue-500/10"
               >
                 Upload new image
@@ -363,6 +414,7 @@ ${formattedColors}
               <img
                 ref={imgRef}
                 onClick={handleImageClick}
+                data-testid="source-image"
                 className={`max-w-full max-h-[600px] object-contain rounded-xl shadow-lg transition-all duration-700 ease-out select-none ${loading ? "opacity-30 scale-[0.98] blur-[2px] cursor-default" : "opacity-100 scale-100 blur-0 cursor-crosshair"}`}
                 alt="Uploaded source"
                 crossOrigin="anonymous"
@@ -395,6 +447,8 @@ ${formattedColors}
                     <button
                       key={fmt}
                       onClick={() => setColorFormat(fmt)}
+                      data-testid={`format-${fmt}`}
+                      aria-pressed={colorFormat === fmt}
                       className={`px-3 sm:px-4 py-1.5 text-xs font-bold rounded-[8px] transition-all duration-200 uppercase tracking-wider ${
                         colorFormat === fmt 
                           ? "bg-zinc-700 text-white shadow-sm" 
@@ -411,7 +465,13 @@ ${formattedColors}
             <div className="flex flex-col flex-1 border border-zinc-800/80 bg-zinc-900/30 rounded-3xl p-5 sm:p-6 lg:p-8 min-h-[400px] lg:min-h-[500px] shadow-sm relative overflow-hidden w-full">
               {loading ? (
                 // Loading Skeleton Layout
-                <div className="flex flex-col flex-1 h-full animate-in fade-in duration-300">
+                <div
+                  className="flex flex-col flex-1 h-full animate-in fade-in duration-300"
+                  role="status"
+                  aria-live="polite"
+                  data-testid="palette-loading"
+                >
+                  <p className="sr-only">Extracting palette...</p>
                   <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-5">
                     {[...Array(12)].map((_, i) => (
                       <div key={i} className="flex flex-col gap-3 animate-pulse" style={{ animationDelay: `${i * 50}ms` }}>
@@ -423,7 +483,11 @@ ${formattedColors}
                 </div>
               ) : errorMsg ? (
                 // Error Layout
-                <div className="flex flex-col items-center justify-center flex-1 h-full gap-4 text-red-400 p-8 text-center animate-in zoom-in-95 duration-300">
+                <div
+                  className="flex flex-col items-center justify-center flex-1 h-full gap-4 text-red-400 p-8 text-center animate-in zoom-in-95 duration-300"
+                  role="alert"
+                  data-testid="palette-error"
+                >
                   <div className="p-4 bg-red-950/30 rounded-full">
                     <AlertCircle className="w-10 h-10 text-red-500" />
                   </div>
@@ -431,9 +495,12 @@ ${formattedColors}
                 </div>
               ) : palette.length > 0 ? (
                 // Loaded Palette Layout
-                <div className="flex flex-col h-full">
+                <div className="flex flex-col h-full" data-testid="palette-results" data-color-format={colorFormat}>
                   {/* Staggered Colors Grid */}
-                  <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5 relative z-10 mb-8 flex-1">
+                  <div
+                    className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5 relative z-10 mb-8 flex-1"
+                    data-testid="palette-grid"
+                  >
                     {palette.map((color, idx) => {
                       const formattedValue = getFormattedColor(color);
                       const hexPreview = color.hex();
@@ -442,6 +509,7 @@ ${formattedColors}
                         <div
                           key={idx}
                           onClick={() => handleCopy(formattedValue, `color-${idx}`)}
+                          data-testid={`palette-color-${idx}`}
                           className="group flex flex-col gap-2.5 relative cursor-pointer animate-in fade-in slide-in-from-bottom-4 fill-mode-both"
                           style={{ animationDelay: `${idx * 40}ms` }}
                         >
@@ -485,6 +553,7 @@ ${formattedColors}
                   <div className="grid grid-cols-2 gap-3 pt-6 mt-auto border-t border-zinc-800/60 w-full">
                     <button
                       onClick={copyAllHex}
+                      data-testid="copy-all-colors"
                       className="flex items-center justify-center gap-2.5 text-sm font-semibold text-zinc-200 bg-zinc-800 hover:bg-zinc-700 active:scale-95 px-4 py-3 sm:py-3.5 rounded-xl transition-all duration-200 border border-zinc-700 hover:border-zinc-500 shadow-sm"
                     >
                       {copiedState === "all" ? <Check className="w-4 h-4 text-green-400 shrink-0" /> : <ClipboardList className="w-4 h-4 text-zinc-400 shrink-0" />}
@@ -492,6 +561,7 @@ ${formattedColors}
                     </button>
                     <button
                       onClick={openExportModalCSS}
+                      data-testid="export-css"
                       className="flex items-center justify-center gap-2.5 text-sm font-semibold text-zinc-200 bg-zinc-800 hover:bg-zinc-700 active:scale-95 px-4 py-3 sm:py-3.5 rounded-xl transition-all duration-200 border border-zinc-700 hover:border-zinc-500 shadow-sm"
                     >
                       <Code2 className="w-4 h-4 text-zinc-400 shrink-0" />
@@ -499,6 +569,7 @@ ${formattedColors}
                     </button>
                     <button
                       onClick={openExportModalJSON}
+                      data-testid="export-json"
                       className="flex items-center justify-center gap-2.5 text-sm font-semibold text-zinc-200 bg-zinc-800 hover:bg-zinc-700 active:scale-95 px-4 py-3 sm:py-3.5 rounded-xl transition-all duration-200 border border-zinc-700 hover:border-zinc-500 shadow-sm"
                     >
                       <FileJson className="w-4 h-4 text-zinc-400 shrink-0" />
@@ -506,6 +577,7 @@ ${formattedColors}
                     </button>
                     <button
                       onClick={openExportModalTailwind}
+                      data-testid="export-tailwind"
                       className="flex items-center justify-center gap-2.5 text-sm font-semibold text-zinc-200 bg-zinc-800 hover:bg-zinc-700 active:scale-95 px-4 py-3 sm:py-3.5 rounded-xl transition-all duration-200 border border-zinc-700 hover:border-zinc-500 shadow-sm"
                     >
                       <Wind className="w-4 h-4 text-zinc-400 shrink-0" />
@@ -603,13 +675,21 @@ ${formattedColors}
       {/* Export Modal Overlay */}
       {exportModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="bg-zinc-950 border border-zinc-800 rounded-2xl w-full max-w-2xl overflow-hidden shadow-2xl flex flex-col animate-in zoom-in-95 duration-200 ease-out max-h-[90dvh]">
+          <div
+            className="bg-zinc-950 border border-zinc-800 rounded-2xl w-full max-w-2xl overflow-hidden shadow-2xl flex flex-col animate-in zoom-in-95 duration-200 ease-out max-h-[90dvh]"
+            role="dialog"
+            aria-modal="true"
+            aria-label={`Export as ${exportModal.formatName}`}
+            data-testid="export-modal"
+            data-export-format={exportModal.formatName}
+          >
             <div className="px-6 py-4 border-b border-zinc-800 flex items-center justify-between bg-zinc-900/50">
               <h3 className="text-lg font-semibold text-zinc-100 flex items-center gap-2">
                 Export as {exportModal.formatName}
               </h3>
               <button 
                 onClick={() => setExportModal(null)} 
+                data-testid="export-modal-close"
                 className="text-zinc-500 hover:text-zinc-200 transition-colors p-1 hover:bg-zinc-800 rounded-md"
               >
                  <X className="w-5 h-5" />
@@ -617,7 +697,10 @@ ${formattedColors}
             </div>
             
             <div className="relative bg-zinc-950 p-4 sm:p-6 overflow-y-auto max-h-[40vh] sm:max-h-[55vh] custom-scrollbar border-b border-zinc-800">
-              <pre className="text-sm font-mono text-zinc-300 whitespace-pre-wrap break-all leading-relaxed">
+              <pre
+                className="text-sm font-mono text-zinc-300 whitespace-pre-wrap break-all leading-relaxed"
+                data-testid="export-modal-content"
+              >
                 {exportModal.content}
               </pre>
             </div>
@@ -625,12 +708,14 @@ ${formattedColors}
             <div className="px-6 py-5 bg-zinc-900/50 flex flex-wrap justify-end gap-3 sm:gap-4">
               <button 
                 onClick={handleModalCopy} 
+                data-testid="export-modal-copy"
                 className="flex items-center justify-center gap-2 font-semibold bg-zinc-800 hover:bg-zinc-700 text-zinc-200 px-5 py-2.5 rounded-lg transition-colors border border-zinc-700 w-full sm:w-auto active:scale-95"
               >
                 <Copy className="w-4 h-4" /> Copy Snippet
               </button>
               <button 
                 onClick={handleModalDownload} 
+                data-testid="export-modal-download"
                 className="flex items-center justify-center gap-2 font-semibold bg-zinc-100 hover:bg-white text-zinc-900 px-5 py-2.5 rounded-lg transition-colors w-full sm:w-auto active:scale-95 shadow-sm"
               >
                 <Download className="w-4 h-4" /> Download File

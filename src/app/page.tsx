@@ -85,6 +85,8 @@ export default function Home() {
         {/* CTA */}
         <Link
           href="/palette"
+          data-testid="primary-palette-cta"
+          aria-label="Open palette tool"
           className="group relative z-10 inline-flex items-center gap-2.5 bg-zinc-100 hover:bg-white text-zinc-900 font-semibold px-7 py-3.5 rounded-xl transition-all duration-200 shadow-sm hover:shadow-lg hover:shadow-white/[0.08] active:scale-[0.97] text-sm sm:text-base"
         >
           Open Palette Tool
@@ -190,10 +192,12 @@ export default function Home() {
           <p className="text-zinc-500 text-sm">For designers and developers who want colors, fast.</p>
           <Link
             href="/palette"
+            data-testid="secondary-palette-cta"
+            aria-label="Try the palette tool"
             className="group inline-flex items-center gap-2 text-sm font-semibold text-zinc-300 hover:text-white border border-zinc-700 hover:border-zinc-500 px-5 py-2.5 rounded-xl transition-all duration-200 bg-zinc-900/40 hover:bg-zinc-800/60 active:scale-95"
           >
             <Wind className="w-4 h-4 text-zinc-500 group-hover:text-emerald-400 transition-colors" />
-            Try it now — it&apos;s free
+            Try it now - it&apos;s free
           </Link>
         </section>
       </FadeUp>

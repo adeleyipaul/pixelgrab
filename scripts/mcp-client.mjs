@@ -1,10 +1,42 @@
 import { spawn } from "node:child_process";
-import { readFileSync } from "node:fs";
-import { resolve } from "node:path";
+import { existsSync, readFileSync, readdirSync } from "node:fs";
+import { join, resolve } from "node:path";
 
 const repoRoot = resolve(import.meta.dirname, "..");
 const timeoutMs = Number(process.env.MCP_CLIENT_TIMEOUT_MS || 20 * 60 * 1000);
 const mode = process.argv[2] || "list-tools";
+
+function loadTestSpriteKey() {
+  if (process.env.API_KEY) return;
+  if (process.env.TESTSPRITE_API_KEY) {
+    process.env.API_KEY = process.env.TESTSPRITE_API_KEY;
+    return;
+  }
+
+  const envPath = resolve(repoRoot, ".env");
+  if (!existsSync(envPath)) return;
+
+  for (const line of readFileSync(envPath, "utf8").split(/\r?\n/)) {
+    const match = line.match(/^\s*(?:export\s+)?(?:TESTSPRITE_API_KEY|API_KEY)\s*=\s*(.+)\s*$/);
+    if (match) {
+      process.env.API_KEY = match[1].trim().replace(/^["']|["']$/g, "");
+      return;
+    }
+  }
+}
+
+function findCachedTestSpriteEntry() {
+  const root = process.env.LOCALAPPDATA && join(process.env.LOCALAPPDATA, "npm-cache", "_npx");
+  if (!root || !existsSync(root)) return null;
+
+  for (const dir of readdirSync(root).reverse()) {
+    const packagePath = join(root, dir, "node_modules", "@testsprite", "testsprite-mcp", "package.json");
+    const entryPath = join(root, dir, "node_modules", "@testsprite", "testsprite-mcp", "dist", "index.js");
+    if (existsSync(packagePath) && existsSync(entryPath)) return entryPath;
+  }
+
+  return null;
+}
 
 function usage() {
   console.error("Usage:");
@@ -46,15 +78,18 @@ class McpClient {
     this.buffer = Buffer.alloc(0);
     this.stderr = "";
 
+    loadTestSpriteKey();
+    if (!process.env.API_KEY) {
+      throw new Error("Missing TestSprite API key. Set TESTSPRITE_API_KEY or API_KEY.");
+    }
+
+    const cachedEntry = findCachedTestSpriteEntry();
+    const command = cachedEntry ? process.execPath : "npx.cmd";
+    const args = cachedEntry ? [cachedEntry] : ["--yes", "@testsprite/testsprite-mcp@latest"];
+
     this.child = spawn(
-      "powershell",
-      [
-        "-NoProfile",
-        "-ExecutionPolicy",
-        "Bypass",
-        "-File",
-        resolve(repoRoot, "scripts", "testsprite-mcp.ps1"),
-      ],
+      command,
+      args,
       {
         cwd: repoRoot,
         env: process.env,
@@ -69,6 +104,7 @@ class McpClient {
 
     this.child.stderr.on("data", (chunk) => {
       this.stderr += chunk.toString("utf8");
+      process.stderr.write(chunk);
     });
 
     this.child.on("exit", (code, signal) => {
@@ -117,7 +153,7 @@ class McpClient {
 
   async init() {
     await this.request("initialize", {
-      protocolVersion: "2024-11-05",
+      protocolVersion: "2025-06-18",
       capabilities: {
         roots: {
           listChanged: true,
@@ -141,6 +177,12 @@ if (!["list-tools", "call-tool"].includes(mode)) usage();
 if (mode === "call-tool" && !process.argv[3]) usage();
 
 const client = new McpClient();
+const hardTimer = setTimeout(async () => {
+  process.stderr.write(`MCP client timed out after ${timeoutMs}ms.\n`);
+  if (client.stderr) process.stderr.write(`Captured stderr:\n${client.stderr}\n`);
+  await client.close();
+  process.exit(1);
+}, timeoutMs + 1000);
 
 try {
   await client.init();
@@ -156,5 +198,6 @@ try {
 
   process.stdout.write(`${JSON.stringify(result, null, 2)}\n`);
 } finally {
+  clearTimeout(hardTimer);
   await client.close();
 }

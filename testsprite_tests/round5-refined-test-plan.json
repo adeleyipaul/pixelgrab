@@ -1,0 +1,126 @@
+[
+  {
+    "id": "R5-TC001",
+    "replaces": ["TC001", "TC002"],
+    "title": "Load bundled sample image and display extracted palette",
+    "bucket": "replacement",
+    "steps": [
+      "Navigate to /palette",
+      "Click [data-testid='sample-image-button']",
+      "Wait for [data-testid='palette-loading'] to finish",
+      "Assert [data-testid='source-image'] is visible",
+      "Assert at least one [data-testid^='palette-color-'] swatch is visible"
+    ]
+  },
+  {
+    "id": "R5-TC002",
+    "replaces": ["TC003"],
+    "title": "Copy a single color from sample palette",
+    "bucket": "rewrite",
+    "steps": [
+      "Load the bundled sample image",
+      "Click [data-testid='palette-color-0']",
+      "Assert a copy success toast is visible"
+    ]
+  },
+  {
+    "id": "R5-TC003",
+    "replaces": ["TC004"],
+    "title": "Copy all colors from sample palette",
+    "bucket": "rewrite",
+    "steps": [
+      "Load the bundled sample image",
+      "Click [data-testid='copy-all-colors']",
+      "Assert the Copy All button or toast confirms copy success"
+    ]
+  },
+  {
+    "id": "R5-TC004",
+    "replaces": ["TC005", "TC010", "TC014"],
+    "title": "Switch RGB and HSL formats after sample extraction",
+    "bucket": "rewrite",
+    "steps": [
+      "Load the bundled sample image",
+      "Click [data-testid='format-rgb']",
+      "Assert visible swatch values contain rgb(",
+      "Click [data-testid='format-hsl']",
+      "Assert visible swatch values contain hsl(",
+      "Assert palette swatches remain visible"
+    ]
+  },
+  {
+    "id": "R5-TC005",
+    "replaces": ["TC006"],
+    "title": "Reset sample extraction to upload state",
+    "bucket": "rewrite",
+    "steps": [
+      "Load the bundled sample image",
+      "Click [data-testid='upload-new-image']",
+      "Assert [data-testid='image-dropzone'] is visible",
+      "Assert palette swatches are not visible"
+    ]
+  },
+  {
+    "id": "R5-TC006",
+    "replaces": ["TC007"],
+    "title": "Export CSS from sample palette",
+    "bucket": "rewrite",
+    "steps": [
+      "Load the bundled sample image",
+      "Click [data-testid='export-css']",
+      "Assert the modal contains CSS variables",
+      "Click [data-testid='export-modal-copy']",
+      "Click [data-testid='export-modal-close']"
+    ]
+  },
+  {
+    "id": "R5-TC007",
+    "replaces": ["TC008"],
+    "title": "Export JSON from sample palette",
+    "bucket": "rewrite",
+    "steps": [
+      "Load the bundled sample image",
+      "Click [data-testid='export-json']",
+      "Assert the modal contains a colors JSON array",
+      "Click [data-testid='export-modal-copy']",
+      "Click [data-testid='export-modal-download'] if the runner supports downloads"
+    ]
+  },
+  {
+    "id": "R5-TC008",
+    "replaces": ["TC012"],
+    "title": "Export Tailwind config from sample palette",
+    "bucket": "rewrite",
+    "steps": [
+      "Load the bundled sample image",
+      "Click [data-testid='export-tailwind']",
+      "Assert the modal contains Tailwind color config text",
+      "Click [data-testid='export-modal-copy']",
+      "Click [data-testid='export-modal-close']"
+    ]
+  },
+  {
+    "id": "R5-TC009",
+    "replaces": ["TC011"],
+    "title": "Upload empty state exposes accessible dropzone and guidance",
+    "bucket": "replacement",
+    "steps": [
+      "Navigate to /palette",
+      "Assert [data-testid='image-dropzone'] is visible",
+      "Assert input[data-testid='image-upload-input'] has image accept constraints",
+      "Assert supported format and size guidance is visible"
+    ]
+  },
+  {
+    "id": "R5-TC010",
+    "replaces": ["TC009", "TC013"],
+    "title": "Landing CTAs still navigate to palette tool",
+    "bucket": "control",
+    "steps": [
+      "Navigate to /",
+      "Click [data-testid='primary-palette-cta'] and assert /palette",
+      "Return to /",
+      "Click [data-testid='secondary-palette-cta'] and assert /palette"
+    ]
+  }
+]

@@ -1,0 +1,606 @@
+[
+  {
+    "id": "TC001",
+    "title": "Upload valid image via file picker and start extraction",
+    "description": "Verifies a user can browse-upload a supported image and the app shows a loading skeleton during palette extraction.",
+    "category": "Image upload by click or drag and drop",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /palette"
+      },
+      {
+        "type": "action",
+        "description": "Upload a valid PNG or JPEG image under 10 MB using the file picker"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a loading skeleton is displayed while extraction runs"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify extracted palette swatches are displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC002",
+    "title": "Extract and display source image with swatch grid",
+    "description": "Verifies a supported image produces a displayed source image and an extracted swatch grid with color values.",
+    "category": "Palette extraction and display",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /palette"
+      },
+      {
+        "type": "action",
+        "description": "Upload a valid image under 10 MB using the file picker"
+      },
+      {
+        "type": "action",
+        "description": "Wait for extraction to complete"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the uploaded source image is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify extracted palette swatches with color values are displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC003",
+    "title": "Copy a single color value from the extracted palette",
+    "description": "Users can copy an individual swatch value and receive a success toast confirming the value was copied.",
+    "category": "Color format switching and copy actions",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /palette"
+      },
+      {
+        "type": "action",
+        "description": "Upload a valid image file using the file picker"
+      },
+      {
+        "type": "action",
+        "description": "Wait for the palette extraction to complete"
+      },
+      {
+        "type": "action",
+        "description": "Click a swatch value to copy it"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a success toast is visible confirming the copy action"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC004",
+    "title": "Copy all displayed palette values at once",
+    "description": "Users can copy all currently displayed swatch values with Copy All and receive a success toast confirming the copy action.",
+    "category": "Color format switching and copy actions",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /palette"
+      },
+      {
+        "type": "action",
+        "description": "Upload a valid image file using the file picker"
+      },
+      {
+        "type": "action",
+        "description": "Wait for the palette extraction to complete"
+      },
+      {
+        "type": "action",
+        "description": "Click the Copy All action"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a success toast is visible confirming the copy action"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC005",
+    "title": "Switch palette output format to RGB after extracting colors",
+    "description": "Users can switch the displayed palette values to RGB after a successful extraction and see all swatches update accordingly.",
+    "category": "Color format switching and copy actions",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /palette"
+      },
+      {
+        "type": "action",
+        "description": "Upload a valid image file using the file picker"
+      },
+      {
+        "type": "action",
+        "description": "Wait for the palette extraction to complete"
+      },
+      {
+        "type": "action",
+        "description": "Switch the output format to RGB"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the displayed swatch values are shown in RGB format"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC006",
+    "title": "Reset to upload state with Upload new image",
+    "description": "Verifies a user can clear the current extraction and return to an empty upload state ready for a new file.",
+    "category": "Palette extraction and display",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /palette"
+      },
+      {
+        "type": "action",
+        "description": "Upload a valid image under 10 MB using the file picker"
+      },
+      {
+        "type": "action",
+        "description": "Wait for extraction to complete"
+      },
+      {
+        "type": "action",
+        "description": "Choose Upload new image"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the image upload dropzone is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify extracted palette swatches are not displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC007",
+    "title": "Open Export CSS modal and copy CSS variables snippet",
+    "description": "Users can open the CSS export modal, copy the CSS variables snippet, and close the modal to return to the palette.",
+    "category": "Palette export",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /palette"
+      },
+      {
+        "type": "action",
+        "description": "Upload a valid image file using the file picker"
+      },
+      {
+        "type": "action",
+        "description": "Wait for the palette extraction to complete"
+      },
+      {
+        "type": "action",
+        "description": "Open the Export CSS modal"
+      },
+      {
+        "type": "action",
+        "description": "Copy the export snippet from the modal"
+      },
+      {
+        "type": "action",
+        "description": "Close the modal"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the extracted palette swatches are displayed on the page"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC008",
+    "title": "Open Export JSON modal, copy snippet, and download JSON file",
+    "description": "Users can open the JSON export modal, copy the JSON snippet, and download the JSON export file from the modal.",
+    "category": "Palette export",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /palette"
+      },
+      {
+        "type": "action",
+        "description": "Upload a valid image file using the file picker"
+      },
+      {
+        "type": "action",
+        "description": "Wait for the palette extraction to complete"
+      },
+      {
+        "type": "action",
+        "description": "Open the Export JSON modal"
+      },
+      {
+        "type": "action",
+        "description": "Copy the export snippet from the modal"
+      },
+      {
+        "type": "action",
+        "description": "Download the JSON export file from the modal"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the browser indicates a file download was initiated"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC009",
+    "title": "Open palette tool from landing page",
+    "description": "Verifies a visitor can navigate from the landing page CTA to the palette tool and see the upload area.",
+    "category": "Landing page navigation",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Click the primary call-to-action to open the palette tool"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the user lands on the palette page"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the image upload dropzone is displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC010",
+    "title": "Copy All reflects the currently selected output format",
+    "description": "Users can switch the output format and then use Copy All to copy values in that format with success feedback.",
+    "category": "Color format switching and copy actions",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /palette"
+      },
+      {
+        "type": "action",
+        "description": "Upload a valid image file using the file picker"
+      },
+      {
+        "type": "action",
+        "description": "Wait for the palette extraction to complete"
+      },
+      {
+        "type": "action",
+        "description": "Switch the output format to HSL"
+      },
+      {
+        "type": "action",
+        "description": "Click the Copy All action"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a success toast is visible confirming the copy action"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC011",
+    "title": "Drag-and-drop upload shows drag-active only while dragging",
+    "description": "Verifies drag-and-drop upload shows drag-active UI during drag and then proceeds to extraction after drop.",
+    "category": "Image upload by click or drag and drop",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /palette"
+      },
+      {
+        "type": "action",
+        "description": "Drag a valid image file over the dropzone without releasing it"
+      },
+      {
+        "type": "action",
+        "description": "Move the dragged file away from the dropzone without dropping it"
+      },
+      {
+        "type": "action",
+        "description": "Drag the valid image file over the dropzone again and drop it"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a loading skeleton is displayed while extraction runs"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify extracted palette swatches are displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC012",
+    "title": "Open Export Tailwind modal and copy Tailwind config snippet",
+    "description": "Users can open the Tailwind export modal, copy the Tailwind config snippet, and close the modal successfully.",
+    "category": "Palette export",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /palette"
+      },
+      {
+        "type": "action",
+        "description": "Upload a valid image file using the file picker"
+      },
+      {
+        "type": "action",
+        "description": "Wait for the palette extraction to complete"
+      },
+      {
+        "type": "action",
+        "description": "Open the Export Tailwind modal"
+      },
+      {
+        "type": "action",
+        "description": "Copy the export snippet from the modal"
+      },
+      {
+        "type": "action",
+        "description": "Close the modal"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the extracted palette swatches are displayed on the page"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC013",
+    "title": "Open palette tool from alternate landing CTA",
+    "description": "Verifies a visitor can use the alternate landing CTA to reach the palette tool and see supported file guidance.",
+    "category": "Landing page navigation",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /"
+      },
+      {
+        "type": "action",
+        "description": "Click the secondary call-to-action to try the tool"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the user lands on the palette page"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify supported file guidance is displayed near the upload area"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC014",
+    "title": "Switch from RGB to HSL without re-uploading and keep the palette visible",
+    "description": "Users can change formats multiple times after extraction and still see the palette update without losing the extracted swatches.",
+    "category": "Color format switching and copy actions",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /palette"
+      },
+      {
+        "type": "action",
+        "description": "Upload a valid image file using the file picker"
+      },
+      {
+        "type": "action",
+        "description": "Wait for the palette extraction to complete"
+      },
+      {
+        "type": "action",
+        "description": "Switch the output format to RGB"
+      },
+      {
+        "type": "action",
+        "description": "Switch the output format to HSL"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the displayed swatch values are shown in HSL format"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC015",
+    "title": "Show error state for corrupted image",
+    "description": "Verifies a corrupted or broken image file results in a visible error state indicating the image could not be processed.",
+    "category": "Palette extraction and display",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /palette"
+      },
+      {
+        "type": "action",
+        "description": "Upload a corrupted image file using the file picker"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a visible error state is displayed indicating the image could not be processed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify extracted palette swatches are not displayed"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC016",
+    "title": "Export snippet content updates after changing the palette format and reopening export",
+    "description": "After switching the palette output format, reopening an export modal shows an updated snippet aligned with the current palette state.",
+    "category": "Palette export",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /palette"
+      },
+      {
+        "type": "action",
+        "description": "Upload a valid image file using the file picker"
+      },
+      {
+        "type": "action",
+        "description": "Wait for the palette extraction to complete"
+      },
+      {
+        "type": "action",
+        "description": "Open the Export CSS modal"
+      },
+      {
+        "type": "action",
+        "description": "Close the modal"
+      },
+      {
+        "type": "action",
+        "description": "Switch the output format to RGB"
+      },
+      {
+        "type": "action",
+        "description": "Open the Export CSS modal"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the export snippet is displayed and reflects the current palette state"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC017",
+    "title": "Reject unsupported file type",
+    "description": "Verifies uploading a non-image file is rejected with a visible unsupported file type message and no extraction starts.",
+    "category": "Image upload by click or drag and drop",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /palette"
+      },
+      {
+        "type": "action",
+        "description": "Upload a non-image file using the file picker"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify rejected-file messaging for unsupported file type is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the app remains in the upload state without showing extracted swatches"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC018",
+    "title": "Reject oversized image over 10 MB",
+    "description": "Verifies uploading an image larger than 10 MB is rejected with a visible size limit message and no extraction starts.",
+    "category": "Image upload by click or drag and drop",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /palette"
+      },
+      {
+        "type": "action",
+        "description": "Upload an image file larger than 10 MB using the file picker"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify rejected-file messaging for oversized file is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the app remains in the upload state without showing extracted swatches"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC019",
+    "title": "Handle single-color or very small image output",
+    "description": "Verifies a very small or single-color image results in either at least one swatch or a clear empty-state outcome after extraction.",
+    "category": "Palette extraction and display",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /palette"
+      },
+      {
+        "type": "action",
+        "description": "Upload a very small or single-color image under 10 MB using the file picker"
+      },
+      {
+        "type": "action",
+        "description": "Wait for extraction to complete"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify either extracted palette swatches are displayed or an empty state is displayed indicating no dominant colors were identified"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC020",
+    "title": "Copy action shows failure feedback when clipboard is not available",
+    "description": "When copying is not permitted by the environment, the UI shows a failure toast instead of a success confirmation.",
+    "category": "Color format switching and copy actions",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /palette"
+      },
+      {
+        "type": "action",
+        "description": "Upload a valid image file using the file picker"
+      },
+      {
+        "type": "action",
+        "description": "Wait for the palette extraction to complete"
+      },
+      {
+        "type": "action",
+        "description": "Click a swatch value to copy it"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a failure toast is visible indicating the copy did not succeed"
+      }
+    ],
+    "priority": "Low"
+  }
+]

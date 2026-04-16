@@ -1,0 +1,11 @@
+{
+  "projectName": "pixel-grab",
+  "projectPath": "C:\\Users\\raiden\\Documents\\Hackathons\\pixel-grab",
+  "testIds": [
+    "TC011",
+    "TC012",
+    "TC014"
+  ],
+  "additionalInstruction": "Targeted unblock rerun only for TC011, TC012, and TC014. Do not regenerate or rerun the full suite. Treat TC001, TC002, TC003, TC004, TC005, TC006, TC007, TC008, and TC010 as already passing. Use the updated artifacts in testsprite_tests/TC011_Drag_and_drop_upload_shows_drag_active_only_while_dragging.py, testsprite_tests/TC012_Open_Export_Tailwind_modal_and_copy_Tailwind_config_snippet.py, and testsprite_tests/TC014_Switch_from_RGB_to_HSL_without_re_uploading_and_keep_the_palette_visible.py as the intended test behavior. TC011 should validate drag-active state by dispatching browser DataTransfer dragenter/dragover/dragleave/drop events to [data-testid='image-dropzone'] and asserting data-drag-active plus dropzone-prompt changes; do not depend on native OS drag/drop or filesystem file upload. TC012 should load the palette using [data-testid='sample-image-button'], wait for [data-testid='palette-color-0'], click [data-testid='export-tailwind'], assert [data-testid='export-modal'] with data-export-format='Tailwind Config', assert [data-testid='export-modal-content'] contains non-empty module.exports text and palette-1, copy via [data-testid='export-modal-copy'], then close via [data-testid='export-modal-close']. TC014 should load the sample image, count [data-testid^='palette-color-'], click [data-testid='format-rgb'], assert [data-testid='palette-results'] has data-color-format='rgb', click [data-testid='format-hsl'], assert data-color-format='hsl', assert swatch text contains hsl(, and assert the swatch count stays unchanged. Avoid the old generated --single-process Chromium flag for these three because local verification showed it can close the Chromium target during post-extraction clicks.",
+  "serverMode": "development"
+}

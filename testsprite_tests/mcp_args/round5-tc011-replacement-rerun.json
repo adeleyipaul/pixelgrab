@@ -1,0 +1,9 @@
+{
+  "projectName": "pixel-grab",
+  "projectPath": "C:\\Users\\raiden\\Documents\\Hackathons\\pixel-grab",
+  "testIds": [
+    "TC011"
+  ],
+  "additionalInstruction": "Targeted rerun for TC011 only. Do not rerun or regenerate the full suite. TC012 and TC014 already passed in the previous targeted TestSprite rerun. TestSprite reported it cannot dispatch DataTransfer drag events, so TC011 has been replaced with a platform-executable equivalent. Use testsprite_tests/TC011_Drag_and_drop_upload_shows_drag_active_only_while_dragging.py as the intended behavior: navigate to /palette, assert [data-testid='image-dropzone'] is visible and has aria-label='Image upload dropzone', assert data-drag-active='false', assert [data-testid='dropzone-prompt'] contains 'Drop an image or click to browse', assert [data-testid='drag-active-indicator'] is absent, hover and focus the dropzone, and assert those non-drag interactions do not falsely activate drag-active state. Do not attempt native OS drag/drop, filesystem uploads, DataTransfer dispatch, or set_input_files for this TC011 rerun. The positive DataTransfer drag-event validation is preserved separately in testsprite_tests/TC011_local_drag_event_validation.py for local/manual verification.",
+  "serverMode": "development"
+}

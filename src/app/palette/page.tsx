@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { Dropzone } from "@/components/Dropzone";
-import { ArrowLeft, Copy, Check, Code2, AlertCircle, FileJson, ClipboardList, ImageIcon, Wind, X, Download } from "lucide-react";
+import { ArrowLeft, Copy, Check, Code2, AlertCircle, FileJson, ClipboardList, ImageIcon, Wind, X, Download, Pipette } from "lucide-react";
 import Link from "next/link";
 
 type ColorFormat = "hex" | "rgb" | "hsl";
@@ -43,6 +43,14 @@ export default function PalettePage() {
   
   const [colorFormat, setColorFormat] = useState<ColorFormat>("hex");
   const [exportModal, setExportModal] = useState<ExportModalState>(null);
+
+  type PixelModal = {
+    hex: string;
+    rgb: { r: number; g: number; b: number };
+    previewDataUrl: string;
+  } | null;
+  const [pixelModal, setPixelModal] = useState<PixelModal>(null);
+  const [pixelCopied, setPixelCopied] = useState(false);
 
   const showToast = (message: string, type: "success" | "error") => {
     const id = Date.now();
@@ -221,6 +229,84 @@ ${formattedColors}
     }
   };
 
+  const handleImageClick = (e: React.MouseEvent<HTMLImageElement>) => {
+    const img = imgRef.current;
+    if (!img || loading) return;
+
+    const rect = img.getBoundingClientRect();
+    const clickX = e.clientX - rect.left;
+    const clickY = e.clientY - rect.top;
+
+    const scaleX = img.naturalWidth / rect.width;
+    const scaleY = img.naturalHeight / rect.height;
+    const naturalX = Math.round(clickX * scaleX);
+    const naturalY = Math.round(clickY * scaleY);
+
+    const canvas = document.createElement("canvas");
+    canvas.width = img.naturalWidth;
+    canvas.height = img.naturalHeight;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    ctx.drawImage(img, 0, 0);
+
+    const pixel = ctx.getImageData(
+      Math.min(naturalX, img.naturalWidth - 1),
+      Math.min(naturalY, img.naturalHeight - 1),
+      1, 1
+    ).data;
+    const r = pixel[0], g = pixel[1], b = pixel[2];
+    const hex = "#" + [r, g, b].map(v => v.toString(16).padStart(2, "0")).join("");
+
+    // Build a zoomed preview (100×100 natural px → 200×200 canvas)
+    const previewSize = 200;
+    const zoomRadius = 50;
+    const srcX = Math.max(0, naturalX - zoomRadius);
+    const srcY = Math.max(0, naturalY - zoomRadius);
+    const srcW = Math.min(zoomRadius * 2, img.naturalWidth - srcX);
+    const srcH = Math.min(zoomRadius * 2, img.naturalHeight - srcY);
+
+    const pCanvas = document.createElement("canvas");
+    pCanvas.width = previewSize;
+    pCanvas.height = previewSize;
+    const pCtx = pCanvas.getContext("2d");
+    if (!pCtx) return;
+    pCtx.drawImage(img, srcX, srcY, srcW, srcH, 0, 0, previewSize, previewSize);
+
+    // Crosshair
+    const cx = previewSize / 2, cy = previewSize / 2;
+    pCtx.strokeStyle = "rgba(255,255,255,0.9)";
+    pCtx.lineWidth = 1.5;
+    pCtx.beginPath();
+    pCtx.moveTo(cx - 18, cy); pCtx.lineTo(cx + 18, cy);
+    pCtx.moveTo(cx, cy - 18); pCtx.lineTo(cx, cy + 18);
+    pCtx.stroke();
+    pCtx.strokeStyle = "rgba(0,0,0,0.4)";
+    pCtx.lineWidth = 3;
+    pCtx.beginPath();
+    pCtx.arc(cx, cy, 13, 0, Math.PI * 2);
+    pCtx.stroke();
+    pCtx.strokeStyle = "rgba(255,255,255,0.95)";
+    pCtx.lineWidth = 1.5;
+    pCtx.beginPath();
+    pCtx.arc(cx, cy, 13, 0, Math.PI * 2);
+    pCtx.stroke();
+
+    setPixelCopied(false);
+    setPixelModal({ hex, rgb: { r, g, b }, previewDataUrl: pCanvas.toDataURL() });
+  };
+
+  const handlePixelCopy = () => {
+    if (!pixelModal) return;
+    try {
+      navigator.clipboard.writeText(pixelModal.hex.toUpperCase());
+      setPixelCopied(true);
+      showToast(`Copied ${pixelModal.hex.toUpperCase()}`, "success");
+      setTimeout(() => setPixelCopied(false), 2000);
+    } catch {
+      showToast("Failed to copy color", "error");
+    }
+  };
+
   const clearUpload = () => {
     setFile(null);
     setPalette([]);
@@ -276,11 +362,18 @@ ${formattedColors}
             <div className="relative rounded-3xl overflow-hidden border border-zinc-800/80 bg-zinc-900/30 flex flex-col items-center justify-center p-4 sm:p-6 min-h-[400px] lg:min-h-[500px] shadow-sm flex-1 w-full">
               <img
                 ref={imgRef}
-                className={`max-w-full max-h-[600px] object-contain rounded-xl shadow-lg transition-all duration-700 ease-out ${loading ? "opacity-30 scale-[0.98] blur-[2px]" : "opacity-100 scale-100 blur-0"}`}
+                onClick={handleImageClick}
+                className={`max-w-full max-h-[600px] object-contain rounded-xl shadow-lg transition-all duration-700 ease-out select-none ${loading ? "opacity-30 scale-[0.98] blur-[2px] cursor-default" : "opacity-100 scale-100 blur-0 cursor-crosshair"}`}
                 alt="Uploaded source"
                 crossOrigin="anonymous"
               />
             </div>
+            {!loading && palette.length > 0 && (
+              <p className="flex items-center gap-1.5 text-xs text-zinc-500 mt-1 px-1">
+                <Pipette className="w-3.5 h-3.5" />
+                Click anywhere on the image to pick a color
+              </p>
+            )}
           </div>
 
           {/* Right Column: Palette Results */}
@@ -426,6 +519,82 @@ ${formattedColors}
                   <p>No dominant colors identified.</p>
                 </div>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Pixel Picker Modal */}
+      {pixelModal && (
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200"
+          onClick={() => setPixelModal(null)}
+        >
+          <div
+            className="bg-zinc-950 border border-zinc-800 rounded-2xl overflow-hidden shadow-2xl flex flex-col w-full max-w-xs animate-in zoom-in-95 duration-200 ease-out"
+            onClick={e => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between px-5 py-3.5 border-b border-zinc-800 bg-zinc-900/60">
+              <h3 className="text-sm font-semibold text-zinc-200 flex items-center gap-2">
+                <Pipette className="w-4 h-4 text-zinc-400" />
+                Picked Color
+              </h3>
+              <button
+                onClick={() => setPixelModal(null)}
+                className="text-zinc-500 hover:text-zinc-200 transition-colors p-1 hover:bg-zinc-800 rounded-md"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Zoomed preview */}
+            <div className="relative w-full aspect-square bg-zinc-900 overflow-hidden">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={pixelModal.previewDataUrl}
+                alt="Zoomed preview"
+                className="w-full h-full object-cover"
+                style={{ imageRendering: "pixelated" }}
+              />
+            </div>
+
+            {/* Color info & copy */}
+            <div className="flex flex-col gap-4 px-5 py-5">
+              {/* Swatch + values */}
+              <div className="flex items-center gap-4">
+                <div
+                  className="w-14 h-14 rounded-xl shadow-md border border-zinc-700/50 shrink-0"
+                  style={{ backgroundColor: pixelModal.hex }}
+                />
+                <div className="flex flex-col gap-1 min-w-0">
+                  <span className="font-mono text-xl font-bold text-zinc-100 tracking-wide">
+                    {pixelModal.hex.toUpperCase()}
+                  </span>
+                  <span className="font-mono text-xs text-zinc-500">
+                    rgb({pixelModal.rgb.r}, {pixelModal.rgb.g}, {pixelModal.rgb.b})
+                  </span>
+                  <span className="font-mono text-xs text-zinc-500">
+                    {rgbToHslStr(pixelModal.rgb.r, pixelModal.rgb.g, pixelModal.rgb.b)}
+                  </span>
+                </div>
+              </div>
+
+              {/* Copy button */}
+              <button
+                onClick={handlePixelCopy}
+                className={`flex items-center justify-center gap-2.5 w-full py-3 rounded-xl text-sm font-semibold transition-all duration-200 active:scale-95 ${
+                  pixelCopied
+                    ? "bg-emerald-900/60 border border-emerald-700/60 text-emerald-400"
+                    : "bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 hover:border-zinc-500 text-zinc-200"
+                }`}
+              >
+                {pixelCopied ? (
+                  <><Check className="w-4 h-4" /> Copied!</>
+                ) : (
+                  <><Copy className="w-4 h-4" /> Copy HEX</>
+                )}
+              </button>
             </div>
           </div>
         </div>

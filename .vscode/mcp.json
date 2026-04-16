@@ -1,0 +1,14 @@
+{
+  "servers": {
+    "TestSprite": {
+      "command": "powershell",
+      "args": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}\\scripts\\testsprite-mcp.ps1"
+      ]
+    }
+  }
+}

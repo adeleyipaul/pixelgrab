@@ -14,6 +14,7 @@ Upload an image, extract its dominant palette, switch between formats, and expor
 
 ## 🎥 Demo Video
 
+https://youtu.be/zkBV997LIzU
 
 ---
 
